@@ -4,12 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>THÔNG TIN KHÁCH SIM AI</title>
+<!-- SIM AI GitHub Wrapper V2 Performance -->
 
 <meta name="theme-color" content="#09152b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SIM AI">
 
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link rel="dns-prefetch" href="//script.google.com">
+<link rel="dns-prefetch" href="//script.googleusercontent.com">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -40,7 +45,7 @@ body.app-ready #appFrame{opacity:1;transform:scale(1)}
   background:
     radial-gradient(circle at 50% 25%,rgba(255,215,132,.10),transparent 25%),
     linear-gradient(180deg,#071326 0%,#0b1c35 55%,#102746 100%);
-  transition:opacity .45s ease,visibility .45s ease;
+  transition:opacity .18s ease,visibility .18s ease;
 }
 #loading.hide{opacity:0;visibility:hidden;pointer-events:none}
 
@@ -188,6 +193,11 @@ body.app-ready #appFrame{opacity:1;transform:scale(1)}
   90%{opacity:.35}
   100%{transform:translate3d(-14px,-105vh,0) rotate(-4deg) scale(.88);opacity:0}
 }
+
+body.net-lite .lanterns{display:none}
+body.net-lite .logo{animation:none}
+body.net-lite .mountain,body.net-lite .mist{filter:none}
+
 @media(max-height:650px){
   .moon{top:4vh}
   .card{margin-top:-2vh}
@@ -237,7 +247,7 @@ body.app-ready #appFrame{opacity:1;transform:scale(1)}
     <div class="badge"><b></b>SIM AI • Đang khởi động</div>
 
     <!-- LOGO DUY NHẤT -->
-    <img src="logo-loading.png" class="logo" alt="SIM AI">
+    <img src="logo-loading.png" class="logo" alt="SIM AI" decoding="async" fetchpriority="low">
 
     <h1 class="title"></h1>
     <div class="sub">Đang mở ứng dụng</div>
@@ -253,13 +263,21 @@ body.app-ready #appFrame{opacity:1;transform:scale(1)}
 
 <script>
 (() => {
+  const t0 = performance.now();
   const frame = document.getElementById("appFrame");
   const loading = document.getElementById("loading");
   const bar = document.getElementById("progressBar");
   const caption = document.getElementById("loadingCaption");
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
+
+  /* Chỉ giảm hiệu ứng khi Data Saver hoặc mạng thực sự chậm. */
+  if (conn && (conn.saveData || /(^|-)2g$|3g/i.test(conn.effectiveType || ""))) {
+    document.body.classList.add("net-lite");
+  }
 
   let progress = 12;
   let done = false;
+  let iframeLoadMs = null;
 
   const texts = [
     "Vui lòng chờ trong giây lát",
@@ -274,21 +292,21 @@ body.app-ready #appFrame{opacity:1;transform:scale(1)}
            v < 80 ? texts[2] : texts[3];
   }
 
+  /* Nhẹ hơn bản cũ: ít lần cập nhật DOM hơn. */
   const timer = setInterval(() => {
-    if(done) return;
+    if (done) return;
+    if (progress < 35) progress += 5;
+    else if (progress < 60) progress += 3;
+    else if (progress < 82) progress += 2;
+    else if (progress < 92) progress += .7;
 
-    if(progress < 35) progress += Math.random() * 5;
-    else if(progress < 60) progress += Math.random() * 3;
-    else if(progress < 82) progress += Math.random() * 1.8;
-    else if(progress < 92) progress += Math.random() * .7;
-
-    progress = Math.min(progress,92);
+    progress = Math.min(progress, 92);
     bar.style.width = progress + "%";
     caption.textContent = textFor(progress);
-  },220);
+  }, 360);
 
   function finish(){
-    if(done) return;
+    if (done) return;
     done = true;
     clearInterval(timer);
 
@@ -296,18 +314,74 @@ body.app-ready #appFrame{opacity:1;transform:scale(1)}
     caption.textContent = "Hoàn tất";
     document.body.classList.add("app-ready");
 
-    setTimeout(() => loading.classList.add("hide"),180);
+    /* Chỉ chờ đúng thời gian fade, không giữ màn hình intro thêm nhiều giây. */
+    setTimeout(() => loading.classList.add("hide"), 190);
+
+    if (window.__SIM_WRAPPER_PERF__) {
+      window.__SIM_WRAPPER_PERF__.readyMs = Math.round(performance.now() - t0);
+      renderPerf();
+    }
   }
 
-  /* Khi Google Web App tải xong -> mở ứng dụng */
+  /*
+   * BẢN CŨ: iframe load xong còn chờ 5.000 ms.
+   * BẢN MỚI: chỉ chờ 80 ms để browser hoàn tất paint rồi hiện Web App.
+   */
   frame.addEventListener("load", () => {
-    setTimeout(finish,5000);
-  });
+    iframeLoadMs = Math.round(performance.now() - t0);
+    if (window.__SIM_WRAPPER_PERF__) {
+      window.__SIM_WRAPPER_PERF__.iframeLoadMs = iframeLoadMs;
+    }
+    setTimeout(finish, 80);
+  }, { once:true });
 
-  /* Không để màn hình loading treo vô hạn */
+  /* Fallback chỉ dùng khi sự kiện load có vấn đề; không ảnh hưởng đường chạy bình thường. */
   setTimeout(() => {
-    if(!done) finish();
-  },8500);
+    if (!done) finish();
+  }, 8000);
+
+  /* ?perf=1: xem riêng overhead của lớp GitHub wrapper. */
+  const perfEnabled = new URLSearchParams(location.search).get("perf") === "1";
+  if (perfEnabled) {
+    window.__SIM_WRAPPER_PERF__ = {
+      network: conn ? (conn.effectiveType || "unknown") : "unknown",
+      saveData: !!(conn && conn.saveData),
+      downlink: conn && Number.isFinite(conn.downlink) ? conn.downlink : null,
+      rtt: conn && Number.isFinite(conn.rtt) ? conn.rtt : null,
+      shellDomMs: null,
+      iframeLoadMs: null,
+      readyMs: null
+    };
+
+    const panel = document.createElement("div");
+    panel.id = "wrapperPerf";
+    panel.style.cssText =
+      "position:fixed;z-index:99999;right:8px;bottom:8px;max-width:270px;" +
+      "padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.78);" +
+      "color:#fff;font:11px/1.45 Arial,sans-serif;white-space:pre-line;" +
+      "pointer-events:none";
+    document.body.appendChild(panel);
+
+    window.renderPerf = function(){
+      const p = window.__SIM_WRAPPER_PERF__;
+      panel.textContent =
+        "GitHub Wrapper PERF\n" +
+        "Network: " + p.network + (p.saveData ? " • SaveData" : "") + "\n" +
+        "Downlink: " + (p.downlink ?? "-") + " Mbps • RTT: " + (p.rtt ?? "-") + " ms\n" +
+        "DOM shell: " + (p.shellDomMs ?? "-") + " ms\n" +
+        "Iframe load: " + (p.iframeLoadMs ?? "-") + " ms\n" +
+        "Wrapper ready: " + (p.readyMs ?? "-") + " ms";
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      window.__SIM_WRAPPER_PERF__.shellDomMs = Math.round(performance.now() - t0);
+      renderPerf();
+    }, { once:true });
+
+    renderPerf();
+  } else {
+    window.renderPerf = function(){};
+  }
 })();
 </script>
 
