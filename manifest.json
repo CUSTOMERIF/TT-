@@ -1,6 +1,6 @@
 {
-  "name": "THÔNG TIN KHÁCH SIM AI",
-  "short_name": "SIM AI",
+  "name": "TRA CỨU THÔNG TIN",
+  "short_name": "TRA CỨU",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0b1630",
