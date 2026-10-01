@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>THÔNG TIN KHÁCH SIM AI</title>
-<!-- SIM AI GitHub Wrapper V2 Performance -->
+<title>TRA CỨU THÔNG TIN</title>
+<!-- TRA CỨU THÔNG TIN • GitHub Wrapper V2 Performance -->
 
 <meta name="theme-color" content="#09152b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SIM AI">
+<meta name="apple-mobile-web-app-title" content="TRA CỨU THÔNG TIN">
 
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
@@ -217,12 +217,12 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
   src="https://script.google.com/macros/s/AKfycbwCo9lVvmZwhJVceXJAtWrlIg2l5VnIfosQBCqjXJf3A2ySXkvJX_hf-Pp7xAla7HDR/exec"
   allow="clipboard-read; clipboard-write"
   loading="eager"
-  title="SIM AI"
+  title="TRA CỨU THÔNG TIN"
 ></iframe>
 
 <!-- CHỈ CÓ 1 LOGO Ở ĐÂY.
-     ĐÃ XÓA HOÀN TOÀN INTRO-LOGO + LOGO THỨ HAI CỦA CODE CŨ. -->
-<section id="loading" aria-label="Đang tải ứng dụng">
+     GIỮ NGUYÊN LOGO LOADING HIỆN TẠI. -->
+<section id="loading" aria-label="Đang tải TRA CỨU THÔNG TIN">
   <div class="stars"></div>
   <div class="moon"></div>
 
@@ -244,13 +244,13 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
   </div>
 
   <div class="card">
-    <div class="badge"><b></b>SIM AI • Đang khởi động</div>
+    <div class="badge"><b></b>TRA CỨU THÔNG TIN • Đang khởi động</div>
 
-    <!-- LOGO DUY NHẤT -->
-    <img src="logo-loading.png" class="logo" alt="SIM AI" decoding="async" fetchpriority="low">
+    <!-- LOGO LOADING DUY NHẤT -->
+    <img src="logo-loading.png" class="logo" alt="TRA CỨU THÔNG TIN" decoding="async" fetchpriority="low">
 
-    <h1 class="title"></h1>
-    <div class="sub">Đang mở ứng dụng</div>
+    <h1 class="title">TRA CỨU THÔNG TIN</h1>
+    <div class="sub">Đang mở ứng dụng tra cứu</div>
 
     <div class="progress">
       <div class="bar" id="progressBar"></div>
@@ -281,8 +281,8 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
 
   const texts = [
     "Vui lòng chờ trong giây lát",
-    "Đang kết nối dữ liệu khách hàng...",
-    "Đang chuẩn bị giao diện SIM AI...",
+    "Đang kết nối dữ liệu TRA CỨU THÔNG TIN...",
+    "Đang chuẩn bị giao diện tra cứu...",
     "Sắp hoàn tất..."
   ];
 
@@ -317,20 +317,20 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
     /* Chỉ chờ đúng thời gian fade, không giữ màn hình intro thêm nhiều giây. */
     setTimeout(() => loading.classList.add("hide"), 190);
 
-    if (window.__SIM_WRAPPER_PERF__) {
-      window.__SIM_WRAPPER_PERF__.readyMs = Math.round(performance.now() - t0);
+    if (window.__TRA_CUU_WRAPPER_PERF__) {
+      window.__TRA_CUU_WRAPPER_PERF__.readyMs = Math.round(performance.now() - t0);
       renderPerf();
     }
   }
 
   /*
    * BẢN CŨ: iframe load xong còn chờ 5.000 ms.
-   * BẢN MỚI: chỉ chờ 80 ms để browser hoàn tất paint rồi hiện Web App.
+   * BẢN HIỆN TẠI: chỉ chờ 80 ms để browser hoàn tất paint rồi hiện Web App.
    */
   frame.addEventListener("load", () => {
     iframeLoadMs = Math.round(performance.now() - t0);
-    if (window.__SIM_WRAPPER_PERF__) {
-      window.__SIM_WRAPPER_PERF__.iframeLoadMs = iframeLoadMs;
+    if (window.__TRA_CUU_WRAPPER_PERF__) {
+      window.__TRA_CUU_WRAPPER_PERF__.iframeLoadMs = iframeLoadMs;
     }
     setTimeout(finish, 80);
   }, { once:true });
@@ -343,7 +343,7 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
   /* ?perf=1: xem riêng overhead của lớp GitHub wrapper. */
   const perfEnabled = new URLSearchParams(location.search).get("perf") === "1";
   if (perfEnabled) {
-    window.__SIM_WRAPPER_PERF__ = {
+    window.__TRA_CUU_WRAPPER_PERF__ = {
       network: conn ? (conn.effectiveType || "unknown") : "unknown",
       saveData: !!(conn && conn.saveData),
       downlink: conn && Number.isFinite(conn.downlink) ? conn.downlink : null,
@@ -363,9 +363,9 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
     document.body.appendChild(panel);
 
     window.renderPerf = function(){
-      const p = window.__SIM_WRAPPER_PERF__;
+      const p = window.__TRA_CUU_WRAPPER_PERF__;
       panel.textContent =
-        "GitHub Wrapper PERF\n" +
+        "TRA CỨU THÔNG TIN • WRAPPER PERF\n" +
         "Network: " + p.network + (p.saveData ? " • SaveData" : "") + "\n" +
         "Downlink: " + (p.downlink ?? "-") + " Mbps • RTT: " + (p.rtt ?? "-") + " ms\n" +
         "DOM shell: " + (p.shellDomMs ?? "-") + " ms\n" +
@@ -374,7 +374,7 @@ body.net-lite .mountain,body.net-lite .mist{filter:none}
     };
 
     document.addEventListener("DOMContentLoaded", () => {
-      window.__SIM_WRAPPER_PERF__.shellDomMs = Math.round(performance.now() - t0);
+      window.__TRA_CUU_WRAPPER_PERF__.shellDomMs = Math.round(performance.now() - t0);
       renderPerf();
     }, { once:true });
 
